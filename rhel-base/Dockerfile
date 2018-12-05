@@ -5,12 +5,15 @@ MAINTAINER Alejandro Martinez Ruiz <amr@redhat.com>
 # Mandatory arguments are user and password for Red Hat subscription.
 ARG RHEL_SUB_USER
 ARG RHEL_SUB_PASSWD
+ARG ON_RHEL_HOST
 
-RUN (subscription-manager unregister || true) \
- && subscription-manager clean \
- && echo "Subscribing (takes a while)" \
- && subscription-manager register --auto-attach \
-    --username=${RHEL_SUB_USER} --password=${RHEL_SUB_PASSWD}
+RUN if [ "x$ON_RHEL_HOST" = "x" ] ; then \
+      (subscription-manager unregister || true) \
+        && subscription-manager clean \
+        && echo "Subscribing (takes a while)" \
+        && subscription-manager register --auto-attach \
+          --username=${RHEL_SUB_USER} --password=${RHEL_SUB_PASSWD} ; \
+    fi
 
 RUN RHEL_MAJOR=$(set -euo pipefail; cat /etc/redhat-release | \
       sed -E -e 's/.*release\s+([0-9]+).*/\1/') \

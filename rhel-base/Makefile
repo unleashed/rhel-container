@@ -24,6 +24,7 @@ build_image: info
 	docker build -t $(IMAGE_NAME) \
 		--build-arg RHEL_SUB_USER=$(RHEL_SUB_USER) \
 		--build-arg RHEL_SUB_PASSWD=$(RHEL_SUB_PASSWD) \
+		--build-arg ON_RHEL_HOST=$(ON_RHEL_HOST) \
 		$(PROJECT_PATH)
 
 .PHONY: run
