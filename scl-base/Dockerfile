@@ -14,9 +14,10 @@ RUN RHEL_MAJOR=$(set -euo pipefail; cat /etc/redhat-release | \
       && yum-config-manager --enable epel \
       && rm -f epel-release-latest-${RHEL_MAJOR}.noarch.rpm ; \
     fi \
+ && yum-config-manager --save --setopt=\*.tsflags=nodocs
  && echo "Installing packages" \
  && INSTALL_PKGS="scl-utils" \
- && yum install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} \
+ && yum install -y ${INSTALL_PKGS} \
  && rpm -V ${INSTALL_PKGS} \
  && yum clean all -y \
  && rm -rf /var/cache/yum

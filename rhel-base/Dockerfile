@@ -59,7 +59,7 @@ RUN RHEL_MAJOR=$(set -euo pipefail; cat /etc/redhat-release | \
     tar \
     unzip \
     yum-utils" \
- && yum install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} \
+ && yum install -y ${INSTALL_PKGS} \
  && rpm -V ${INSTALL_PKGS} \
  && yum clean all -y \
  && rm -rf /var/cache/yum
