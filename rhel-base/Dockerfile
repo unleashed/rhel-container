@@ -2,11 +2,11 @@ FROM registry.access.redhat.com/rhel
 
 MAINTAINER Alejandro Martinez Ruiz <amr@redhat.com>
 
-# Mandatory arguments are user and password for Red Hat subscription.
-ARG RHEL_SUB_USER
-ARG RHEL_SUB_PASSWD
-
-# Optional arguments
+# User and password for Red Hat subscription. You must either provide these,
+# reuse the local host's RHEL subscription, or provide a tar.gz file with the
+# subscription entitlements.
+ARG RHEL_SUB_USER=
+ARG RHEL_SUB_PASSWD=
 
 # If set to any non empty value, it will avoid trying any special handling of
 # subscriptions, as it will assume they will be injected into the image (as Red
@@ -28,12 +28,17 @@ COPY ${ENTITLEMENTS} /tmp/entitlements/
 RUN if [ "x${ON_RHEL_HOST}" = "x" ] ; then \
       if test "x${ENTITLEMENTS}" != "x"; then \
         tar xvzf "/tmp/entitlements/$(basename ${ENTITLEMENTS})" -C /; \
-      else \
+      elif test "x${RHEL_SUB_USER}" != "x" -a "x${RHEL_SUB_PASSWD}" != "x"; then \
         (subscription-manager unregister || true) \
         && subscription-manager clean \
         && echo "Subscribing (takes a while)" \
         && subscription-manager register --auto-attach \
           --username=${RHEL_SUB_USER} --password=${RHEL_SUB_PASSWD} ; \
+      else \
+        echo >&2 "RHEL_SUB_USER and RHEL_SUB_PASSWD are required for subscriptions." ; \
+        echo >&2 "Otherwise use ON_RHEL_HOST if willing to reuse a host's subscription," ; \
+        echo >&2 "or set ENTITLEMENTS to the tar.gz file containing a subscription." ; \
+        exit 1 ; \
       fi \
     fi \
  && rm -rf /tmp/entitlements
